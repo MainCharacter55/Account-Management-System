@@ -1,6 +1,11 @@
 # main.py
 # ----------------------------------------------------------------------------------------------------
 
+import os
+import matplotlib
+matplotlib.use('Agg') # Replit/Linux環境でグラフを表示するための設定 (GUIがない環境用)
+import matplotlib.pyplot as plt # グラフ表示用
+from matplotlib import font_manager
 from data import Account #data.py
 from db import DatabaseManager #db.py
 from manager import AccountManager #manager.py
@@ -8,21 +13,24 @@ from transaction import DepositTransaction #transaction.py
 from decimal import Decimal # 一貫した計算のためにDecimalをインポート
 import api #api.py
 import currency #currency.py
-import matplotlib.pyplot as plt # グラフ表示用
 # ----------------------------------------------------------------------------------------------------
 
-# 日本語表示のためのフォント設定。
-# 1. 使用したい日本語フォントのパスまたは名前を指定します。(Windows: 'Yu Gothic', 'MS Gothic', 'Meiryo' など, Mac: 'Hiragino Maru Gothic Pro' など)。
-FONT_NAME = 'Meiryo'
+# 日本語表示のためのフォント設定 (Replit/Linux対応)
+# 1. 'font.ttf' をプロジェクトのルートディレクトリにアップロードしてください。
+FONT_PATH = './font.ttf' 
 
-# 2. Matplotlibのフォント設定を更新。
-try:
-    plt.rcParams['font.family'] = FONT_NAME
-    # 必要に応じて、マイナス記号が豆腐にならないよう設定。
+if os.path.exists(FONT_PATH):
+    # カスタムフォントを登録
+    font_manager.fontManager.addfont(FONT_PATH)
+    prop = font_manager.FontProperties(fname=FONT_PATH)
+    plt.rcParams['font.family'] = prop.get_name()
+    # マイナス記号の文字化け防止
     plt.rcParams['axes.unicode_minus'] = False 
-except Exception as e:
-    # 指定したフォントが見つからない場合の代替処理（オプション）。
-    # print(f"警告: フォント '{FONT_NAME}' の設定に失敗しました: {e}")
+    print(f"✅ フォント '{prop.get_name()}' を適用しました。")
+else:
+    # ローカル(Windows)実行用のフォールバック
+    plt.rcParams['font.family'] = 'Meiryo'
+    print("⚠️ 警告: font.ttf が見つかりません。デフォルト設定を使用します。")
     pass
 # ----------------------------------------------------------------------------------------------------
 
